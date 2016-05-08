@@ -6,7 +6,6 @@
 
   //returns a map where the key is the flag
   function parseFlags(argv){
-    if(argv.length <3) return;
     argv = argv.slice(2);
     var mapIt, mapItCurr;
     var flags = new Map();
@@ -28,7 +27,6 @@
     });
 
     return flags;
-
   }
 
 })();
