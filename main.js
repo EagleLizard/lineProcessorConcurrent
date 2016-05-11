@@ -1,21 +1,28 @@
 ;(()=>{
-  var fs = require('fs');
+
+  var cluster = require('cluster');
 
   var parseFlags = require('./parseFlags');
   var getFilePaths = require('./fileUtil').getPaths;
   var fromJson = require('./fileUtil').fromJson;
   var lineCounter = require('./lineCounter');
+  var _ = require('lodash');
 
   const FLAGS = require('./flagConstants');
   const SUPPORTED_EXTENSIONS = fromJson('./supportedExtensions.json');
   const NUM_WORKERS = require('os').cpus().length-1;//one thread is master
 
-  var useSynchronous = NUM_WORKERS < 2;
-
-  main();
+  if(cluster.isMaster){
+    main();
+  }else{
+    lineCounter.requestPathFromMaster();
+    process.on('message', (msg)=>{
+      lineCounter.handleMessageFromMaster(msg);
+    });
+  }
 
   function main(){
-    var startPath, flagMap, fileList, extRx, excludeRx;
+    var startPath, flagMap, fileList, extRx, excludeRx, useSynchronous, numLinesPromise, startTime;
 
     flagMap = parseFlags(process.argv);
     startPath = flagMap.get(FLAGS.PATH) || './';
@@ -25,10 +32,19 @@
       process.exit(1);
     }
     excludeRx = getExcludeRx(flagMap.get(FLAGS.EXCLUDERX));
+    useSynchronous = flagMap.has(FLAGS.FORCESYNC) || NUM_WORKERS < 2;
     fileList =  getFilePaths(startPath, extRx, excludeRx);
-    var numLines = 0;
-    console.log('lineCounter total: ', lineCounter.countLinesSync(fileList, NUM_WORKERS));
-
+    console.log('Running in ',(useSynchronous?'sync':'async'), ' mode');
+    startTime = _.now();
+    numLinesPromise = useSynchronous ? lineCounter.countLinesSync(fileList)
+                                     : lineCounter.countLines(fileList, NUM_WORKERS);
+    numLinesPromise.then((result)=>{
+      console.log('Line total: ', result.lineCount);
+      console.log('Comment total: ', result.commentCount);
+      result.extensionMap.forEach((val, key)=>console.log(key, ': ', val));
+      console.log('Execution Time: ', _.now()-startTime,'ms')
+      process.exit(0);
+    });
   }
 
   function getExcludeRx(rxString){
@@ -48,14 +64,13 @@
     extensions = extensions.filter(isSupportedExtension);
     if(!extensions.length) return null;
     var rxString = extensions.reduce((acc,curr,idx)=>{
-      return acc+((idx||'')&&'|')+curr;
+      return acc+((idx||'')&&'|')+curr.extension;
     },'\\.(').concat(')$');
     console.log(rxString);
     return new RegExp(rxString);
   }
 
   function isSupportedExtension(ext){
-    //TODO: pull these from an actual config instead of always returning true
     return SUPPORTED_EXTENSIONS.indexOf(ext)!==-1;
   }
 
