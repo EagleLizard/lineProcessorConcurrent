@@ -1,12 +1,14 @@
 ;(()=>{
 
   var cluster = require('cluster');
+  
+  var _ = require('lodash');
+  var cmd = require('commander');
 
   var parseFlags = require('./parseFlags');
   var getFilePaths = require('./fileUtil').getPaths;
   var fromJson = require('./fileUtil').fromJson;
   var lineCounter = require('./lineCounter');
-  var _ = require('lodash');
 
   const FLAGS = require('./flagConstants');
   const SUPPORTED_EXTENSIONS = fromJson('./supportedExtensions.json');
@@ -60,18 +62,20 @@
 
   //returns null if any extensions are invalid
   function getExtensionsRegex(extensions){
-    extensions = (extensions && extensions.split(' '))  || SUPPORTED_EXTENSIONS;
+    extensions = (extensions && extensions.split(' '))  || SUPPORTED_EXTENSIONS.map((ext)=>ext.extension);
+    console.log(extensions);
     extensions = extensions.filter(isSupportedExtension);
+    console.log(extensions);
     if(!extensions.length) return null;
     var rxString = extensions.reduce((acc,curr,idx)=>{
-      return acc+((idx||'')&&'|')+curr.extension;
+      return acc+((idx||'')&&'|')+curr;
     },'\\.(').concat(')$');
     console.log(rxString);
     return new RegExp(rxString);
   }
 
   function isSupportedExtension(ext){
-    return SUPPORTED_EXTENSIONS.indexOf(ext)!==-1;
+    return !!_.find(SUPPORTED_EXTENSIONS, {extension: ext});
   }
 
 })();

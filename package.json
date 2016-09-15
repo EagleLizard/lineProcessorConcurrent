@@ -1,0 +1,14 @@
+{
+  "name": "line-stats",
+  "version": "1.0.0",
+  "description": "Command line tool for gathering stats on your codebase",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "tyler-whited",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^2.9.0"
+  }
+}

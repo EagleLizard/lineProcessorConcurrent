@@ -4,6 +4,10 @@
     "singleLineCommentPattern":"//"
   },
   {
+    "extension":"es",
+    "singleLineCommentPattern":"//"
+  },
+  {
     "extension":"html"
   },
   {
@@ -28,6 +32,10 @@
   },
   {
     "extension":"java",
+    "singleLineCommentPattern":"//"
+  },
+  {
+    "extension":"scss",
     "singleLineCommentPattern":"//"
   }
 ]
