@@ -1,5 +1,4 @@
 let fileTreeIterator = require('./fileTreeIterator');
-let fileUtil = require('./../fileUtil');
 
 let tests = [
   '../testDir/subDir1',
@@ -7,7 +6,8 @@ let tests = [
   '../testDir/subDir2',
   '../testDir/subDir2/subDir4',
   '../testDir',
-  '../'
+  '../',
+  '../../lineCount'
 ];
 
 main();
