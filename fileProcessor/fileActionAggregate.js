@@ -1,0 +1,4 @@
+/*
+  Acts as a collection of similar actions that perform the same action accross
+  multiple files that we wish to aggregate in a uniform way.
+ */

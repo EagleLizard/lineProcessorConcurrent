@@ -13,11 +13,11 @@
     getAction: getAction
   };
   
-  function getAction(callback){
-    return new FileLineAction(callback);
+  function getAction(callback, final){
+    return new FileLineAction(callback, final);
   }
   
-  function FileLineAction(callback){
+  function FileLineAction(callback, final){
     
     let actions = [];
     
@@ -31,7 +31,7 @@
     function execute(){
       let results = actions.map(fun=>fun());
       actions.length=0;
-      return results;
+      return final?final(results):results;
     }
     
   }

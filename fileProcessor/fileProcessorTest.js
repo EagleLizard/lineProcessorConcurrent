@@ -10,10 +10,14 @@
   ];
   
   let testActions = [
-    fileLineAction.getAction(str=>(()=>str.length)),
-    fileLineAction.getAction(str=>(()=>str.charAt(0))),
-    fileLineAction.getAction(str=>(()=>str.split('').reduce((acc,curr)=>(acc+=curr.charCodeAt(0),acc),0))),
-    fileLineAction.getAction(str=>(()=>str.split('').reverse().join('')))
+    fileLineAction.getAction(str=>(()=>str.length),
+                             strs=>(strs.reduce((acc,curr)=>(acc+=curr,acc),0))),
+    fileLineAction.getAction(str=>(()=>str.charAt(0)),
+                             strs=>(strs.join(''))),
+    fileLineAction.getAction(str=>(()=>str.split('').reduce((acc,curr)=>(acc+=curr.charCodeAt(0),acc),0)),
+                             strs=>(strs.reduce((acc,curr)=>(acc+=curr,acc),0))),
+    fileLineAction.getAction(str=>(()=>str.split('').reverse().join('')),
+                             strs=>strs.reverse().join(''))
   ];
   
   main();
